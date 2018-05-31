@@ -65,7 +65,6 @@ Utils.hideTip = function() {
 Utils.getJson = function(url, success, error, params = {}) {
 	if(!url) return;
 	var loadingInstance = Loading.service({
-		lock: true,
 		fullscreen: true,
 		spinner: 'fa fa-refresh fa-spin fa-3x fa-fw ql-loading',
 		customClass: 'loading page-loading'

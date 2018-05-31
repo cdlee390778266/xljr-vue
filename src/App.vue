@@ -1247,7 +1247,7 @@ export default {
               }
               .slide-code-title {
                   input {
-                      width: 150px;
+                      width: 94%;
                       height: 36px;
                       padding: 0 11px;
                       margin: 5px;

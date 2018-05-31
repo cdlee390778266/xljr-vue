@@ -23,156 +23,156 @@
                 </div>
             </div>
             <div class="screen-select-slide">
-              <template v-for="tab in tabs">
-                <!-- 字段选择下拉 -->
-                <div class="slide-box" v-show="tab.isActive" v-if="tab.type == 'fields'">
-                    <div class="slide-body slide-fields-body">
-                        <span v-for="field in tab.fields" @click="toggleSelected(field)"><i :class="{'fa fa-check-square-o' : field.isSelected, 'fa fa-square-o' : !field.isSelected}"></i>{{field.F002}}</span>
-                    </div>
-                    <div class="slide-foot slide-fields-foot">
-                        <span><i :class="{'fa fa-check-square-o' : tab.isSelectedAll, 'fa fa-square-o' : !tab.isSelectedAll}" @click="toggleSelectAll"></i>全选</span>
-                        <a href="javascript:void(0);" @click="toggleFieldsDialog">字段说明</a>
-                    </div>
-                </div>
-                <!-- 代码选择下拉 -->
-                <div class="slide-box" v-show="tab.isActive" v-if="tab.type == 'code'">
-                    <div class="slide-body">
-                        <div class="slide-code-item">
-                            <div class="slide-code-title">
-                                <input type="text" id="key" value="" class="empty" placeholder="搜索行业分类" />
-                            </div>
-                            <ul id="tree" class="ztree"></ul>
-                            <!-- 加载中 -->
-                            <div class="loading" id="slide-item-loading" style="display: none;"><div><span class="fa fa-refresh fa-spin fa-3x fa-fw margin-bottom"></span></div></div>
-                        </div>
-                        <div class="slide-code-item" handletype="add" id="add">
-                            <div class="code-result">可选代码/查找结果[<span>0</span>]个</div>
-                            <div class="code-list">
-                                <ul>
-                                </ul>
-                                <div class="code-all"><i class="fa fa-square-o"></i>共<strong>0</strong>项</div>
-                            </div>
-                        </div>
-                        <div class="slide-code-handle">
-                            <button class="remove-btn" id="remove-angle"><i class="fa fa-angle-left"></i></button>
-                            <button class="remove-btn" id="remove-all"><i class="fa fa-angle-double-left "></i></button>
-                            <button class="add-btn" id="add-angle"><i class="fa fa-angle-right"></i></button>
-                            <button class="add-btn" id="add-all"><i class="fa fa-angle-double-right"></i></button>
-                            <button class="export" id="export">导出</button>
-                            <ul>
-                                <li><a href="../../data/data.rar">TXT</a></li>
-                                <li><a href="../../data/data.rar">EXCEL</a></li>
-                            </ul>
-                        </div>
+              <!-- 字段选择下拉 -->
+              <div class="slide-box" v-show="tabs[0].isActive">
+                  <div class="slide-body slide-fields-body">
+                      <span v-for="field in tabs[0].fields" @click="toggleSelected(field)"><i :class="{'fa fa-check-square-o' : field.isSelected, 'fa fa-square-o' : !field.isSelected}"></i>{{field.F002}}</span>
+                  </div>
+                  <div class="slide-foot slide-fields-foot">
+                      <span><i :class="{'fa fa-check-square-o' : tabs[0].isSelectedAll, 'fa fa-square-o' : !tabs[0].isSelectedAll}" @click="toggleSelectAll"></i>全选</span>
+                      <a href="javascript:void(0);" @click="toggleFieldsDialog">字段说明</a>
+                  </div>
+              </div>
+              <!-- 代码选择下拉 -->
+              <div class="slide-box" v-show="tabs[1].isActive">
+                  <div class="slide-body">
+                      <div class="slide-code-item">
+                          <div class="slide-code-title">
+                              <el-input placeholder="搜索行业分类" v-model="filterText"></el-input>
+                          </div>
+                          <el-tree :data="tabs[1].trees" :props="tabs[1].defaultProps" show-checkbox @check="handleCheck" :filter-node-method="filterNode" ref="tree"></el-tree>
+                          <!-- 加载中 -->
+                          <div class="loading" id="slide-item-loading" style="display: none;"><div><span class="fa fa-refresh fa-spin fa-3x fa-fw margin-bottom"></span></div></div>
+                      </div>
+                      <div class="slide-code-item" handletype="add" id="add">
+                          <div class="code-result">可选代码/查找结果[<span>{{tabs[1].codesL.length}}</span>]个</div>
+                          <div class="code-list">
+                              <ul>
+                                <li v-for="code in tabs[1].codesL"><span><i :class="{'fa fa-check-square active' : code.isSelected, 'fa fa-square-o' : !code.isSelected}" @click="toggleSelectedCodeL(code)"></i>{{code.F002}}</span></li>
+                              </ul>
+                              <div class="code-all"><i :class="{'fa fa-check-square active' : this.tabs[1].isSelectAllL, 'fa fa-square-o' : !this.tabs[1].isSelectAllL}" @click="toggleSelectedAllL"></i>共<strong>{{tabs[1].selectCodesL.length}}</strong>项</div>
+                          </div>
+                      </div>
+                      <div class="slide-code-handle">
+                          <button class="remove-btn" :class="tabs[1].sigleToLeft ? 'active': ''" @click="sigleToLeft"><i class="fa fa-angle-left"></i></button>
+                          <button class="remove-btn" :class="tabs[1].allToLeft ? 'active': ''" @click="allToLeft"><i class="fa fa-angle-double-left "></i></button>
+                          <button class="add-btn" :class="tabs[1].sigleToRight ? 'active': ''" @click="sigleToRight"><i class="fa fa-angle-right"></i></button>
+                          <button class="add-btn" :class="tabs[1].allToRight ? 'active': ''" @click="allToRight"><i class="fa fa-angle-double-right"></i></button>
+                          <button class="export">导出</button>
+                          <ul>
+                              <li><a href="../../data/data.rar">TXT</a></li>
+                              <li><a href="../../data/data.rar">EXCEL</a></li>
+                          </ul>
+                      </div>
 
-                        <div class="slide-code-item"  handletype="remove" id="remove">
-                            <div class="code-result">可选代码/查找结果[<span>0</span>]个</div>
-                            <div class="code-list">
-                                <ul>
-                                    
-                                </ul>
-                                <div class="code-all"><i class="fa fa-square-o"></i>共<strong>0</strong>项</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="slide-foot slide-foot-code">
-                        <label for="">
-                            代码导入：<input type="file" />
-                            <span><i></i><strong>浏览</strong></span>
-                        </label>
-                        <a href="">导入</a>
-                    </div>
-                </div>
+                      <div class="slide-code-item">
+                          <div class="code-result">可选代码/查找结果[<span>{{tabs[1].codesR.length}}</span>]个</div>
+                          <div class="code-list">
+                              <ul>
+                                  <li v-for="code in tabs[1].codesR"><span><i :class="{'fa fa-check-square active' : code.isSelected, 'fa fa-square-o' : !code.isSelected}" @click="toggleSelectedCodeR(code)"></i>{{code.F002}}</span></li>
+                              </ul>
+                              <div class="code-all"><i :class="{'fa fa-check-square active' : this.tabs[1].isSelectAllR, 'fa fa-square-o' : !this.tabs[1].isSelectAllR}" @click="toggleSelectedAllR"></i>共<strong>{{tabs[1].selectCodesR.length}}</strong>项</div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="slide-foot slide-foot-code">
+                      <label for="">
+                          代码导入：<input type="file" />
+                          <span><i></i><strong>浏览</strong></span>
+                      </label>
+                      <a href="">导入</a>
+                  </div>
+              </div>
 
-                <!-- 条件筛选下拉 -->
-                <div class="slide-box slide-box-cdt" v-show="tab.isActive" v-if="tab.type == 'screen'">
-                    <div class="slide-body slide-body-cdt" >
-                        <div class="cdt-box">
-                            <div class="cdt-item">
-                                <label for="">字段</label>
-                                <select name="" id="screen-fields">
-                                    <option value=""></option>
-                                </select>
-                            </div>
-                            <div class="cdt-item">
-                                <label for="">运算符</label>
-                                <select name="" id="screen-opt">
-                                    <option value=""></option>
-                                    <option value=">">&gt;</option>
-                                    <option value=">=">&gt;=</option>
-                                    <option value="<">&lt;</option>
-                                    <option value="<=">&lt;=</option>
-                                    <option value="=">=</option>
-                                    <option value="<>">!=</option>
-                                    <option value="IS NULL">为空</option>
-                                    <option value="IS NOT NULL">不为空</option>
-                                </select>
-                            </div>
-                            <div class="cdt-item">
-                                <label for="">条件值</label>
-                                <input type="text"  value="" id="screen-input" />
-                            </div>
-                            <div class="cdt-item">
-                                <a href="javascript:void(0);" id="screen-add">添加</a>
-                            </div>
-                        </div>
-                        <div class="cdt-list empty">
-                            <table cellpadding="0" cellspacing="0" >
-                                <thead>
-                                    <tr>
-                                        <th>序号</th>
-                                        <th>字段</th>
-                                        <th>运算符</th>
-                                        <th>条件值</th>
-                                        <th>单位</th>
-                                        <th>条件关系</th>
-                                        <th>操作</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="slide-foot"></div>
-                </div>
-              </template>
+              <!-- 条件筛选下拉 -->
+              <div class="slide-box slide-box-cdt" v-show="tabs[2].isActive">
+                  <div class="slide-body slide-body-cdt" >
+                      <div class="cdt-box">
+                          <div class="cdt-item">
+                              <label for="">字段</label>
+                              <select name="" id="screen-fields">
+                                  <option value=""></option>
+                              </select>
+                          </div>
+                          <div class="cdt-item">
+                              <label for="">运算符</label>
+                              <select name="" id="screen-opt">
+                                  <option value=""></option>
+                                  <option value=">">&gt;</option>
+                                  <option value=">=">&gt;=</option>
+                                  <option value="<">&lt;</option>
+                                  <option value="<=">&lt;=</option>
+                                  <option value="=">=</option>
+                                  <option value="<>">!=</option>
+                                  <option value="IS NULL">为空</option>
+                                  <option value="IS NOT NULL">不为空</option>
+                              </select>
+                          </div>
+                          <div class="cdt-item">
+                              <label for="">条件值</label>
+                              <input type="text"  value="" id="screen-input" />
+                          </div>
+                          <div class="cdt-item">
+                              <a href="javascript:void(0);" id="screen-add">添加</a>
+                          </div>
+                      </div>
+                      <div class="cdt-list empty">
+                          <table cellpadding="0" cellspacing="0" >
+                              <thead>
+                                  <tr>
+                                      <th>序号</th>
+                                      <th>字段</th>
+                                      <th>运算符</th>
+                                      <th>条件值</th>
+                                      <th>单位</th>
+                                      <th>条件关系</th>
+                                      <th>操作</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                  <tr>
+                                      <td></td>
+                                      <td></td>
+                                      <td></td>
+                                      <td></td>
+                                      <td></td>
+                                      <td></td>
+                                      <td></td>
+                                  </tr>
+                                  <tr>
+                                      <td></td>
+                                      <td></td>
+                                      <td></td>
+                                      <td></td>
+                                      <td></td>
+                                      <td></td>
+                                      <td></td>
+                                  </tr>
+                                  <tr>
+                                      <td></td>
+                                      <td></td>
+                                      <td></td>
+                                      <td></td>
+                                      <td></td>
+                                      <td></td>
+                                      <td></td>
+                                  </tr>
+                                  <tr>
+                                      <td></td>
+                                      <td></td>
+                                      <td></td>
+                                      <td></td>
+                                      <td></td>
+                                      <td></td>
+                                      <td></td>
+                                  </tr>
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
+                  <div class="slide-foot"></div>
+              </div>
+              
               <!-- 加载中 -->
               <div class="loading" id="slide-loading" style="display: none;"><div><span class="fa fa-refresh fa-spin fa-3x fa-fw margin-bottom"></span></div></div>
             </div>
@@ -268,6 +268,7 @@ export default {
   name: 'DataData',
   data() {
     return {
+      filterText: '',
       tabs: [
         {
           type: 'fields', //字段选择
@@ -282,8 +283,21 @@ export default {
         {
           type: 'code',   //代码选择
           isActive: false,
-          codes: [],
-          selectCodes: []
+          trees: [],
+          defaultProps: {
+            children: 'children',
+            label: 'name'
+          },
+          codesL: [],
+          selectCodesL: [],
+          isSelectAllL: false,
+          sigleToRight: false,
+          allToRight: false,
+          codesR: [],
+          selectCodesR: [],
+          isSelectAllR: false,
+          sigleToLeft: false,
+          allToLeft: false
         },
         {
           type: 'screen', //条件筛选
@@ -294,12 +308,26 @@ export default {
       ]
     }
   },
+  props: {
+    baseId: {
+      default: ''
+    }
+  },
   methods: {
     changeTab: function(tab) {
       for(var i = 0; i < this.tabs.length; i++) {
         this.tabs[i].isActive = false;
       }
       tab.isActive = true;
+      //如果是代码选择
+      if(tab.type == 'code') {
+        if(!tab.trees.length) {
+          var _this = this;
+          _this.utils.getJson('/static/data/codeTree.json', function(res){
+            _this.tabs[1].trees = res.data.ResData;
+          }, function(){}, {baseId: _this.baseId})
+        }
+      }
     },
     toggleSelected: function(field) {
       field.isSelected = !field.isSelected;
@@ -323,6 +351,180 @@ export default {
     },
     hideFieldsDialog: function() {
       this.tabs[0].isShowDialog = false;
+    },
+    filterNode(value, data) {
+      if (!value) return true;
+      return data.name.indexOf(value) !== -1;
+    },
+    handleCheck: function() {
+      var checkedArr = this.$refs.tree.getCheckedNodes(true);
+      var checkedCodeArr = [];
+      for(var i = 0; i < checkedArr.length; i++) {
+        checkedCodeArr.push(checkedArr[i].id);
+      }
+      
+      var _this = this;
+      _this.utils.getJson('/static/data/code.json', function(res){
+        res.data.ResData.forEach(function(value,i){
+          value.isSelected = false;
+        })
+
+        _this.tabs[1].codesL = res.data.ResData;
+        _this.tabs[1].selectCodesL = [];
+        _this.tabs[1].isSelectAllL = false;
+        _this.tabs[1].sigleToRight = false;
+        _this.tabs[1].allToRight = true;
+
+        _this.tabs[1].codesR = [];
+        _this.tabs[1].selectCodesR = [];
+        _this.tabs[1].isSelectAllR = false;
+        _this.tabs[1].sigleToLeft = false;
+        _this.tabs[1].allToLeft = false;
+
+      }, function(){}, {baseId: _this.baseId, checkedCodeArr: checkedCodeArr})
+    },
+    toggleSelectedCodeL: function(code) {
+      code.isSelected = !code.isSelected;
+
+      var hasSelected = false;
+      this.tabs[1].selectCodesL = [];
+
+      for(var i = 0; i < this.tabs[1].codesL.length; i++) {
+        if(this.tabs[1].codesL[i].isSelected) {
+          this.tabs[1].selectCodesL.push(this.tabs[1].codesL[i]);
+          hasSelected = true;
+        }
+      }
+
+      if(this.tabs[1].codesL.length == this.tabs[1].selectCodesL.length) {
+        this.tabs[1].isSelectAllL = true;
+      }else {
+        this.tabs[1].isSelectAllL = false;
+      }
+
+      this.tabs[1].sigleToRight = hasSelected;
+    },
+    toggleSelectedAllL: function() {
+      if(!this.tabs[1].codesL.length) return;
+
+      this.tabs[1].isSelectAllL = !this.tabs[1].isSelectAllL;
+
+      this.tabs[1].selectCodesL = [];
+      for(var i = 0; i < this.tabs[1].codesL.length; i++) {
+        this.tabs[1].codesL[i].isSelected = this.tabs[1].isSelectAllL;
+        if(this.tabs[1].codesL[i].isSelected) {
+          this.tabs[1].selectCodesL.push(this.tabs[1].codesL[i]);
+        }
+      }
+
+      if(this.tabs[1].selectCodesL.length) {
+        this.tabs[1].sigleToRight = true;
+      }
+    },
+    sigleToRight: function() {
+      if(!this.tabs[1].sigleToRight) return;
+
+      for(var i = 0; i < this.tabs[1].selectCodesL.length; i++) {
+        this.tabs[1].codesL.splice(this.tabs[1].codesL.indexOf(this.tabs[1].selectCodesL[i]), 1);
+        this.tabs[1].selectCodesL[i].isSelected = false;
+      }
+      this.tabs[1].codesR = this.tabs[1].codesR.concat(this.tabs[1].selectCodesL);
+
+      if(!this.tabs[1].codesL.length) {
+        this.tabs[1].allToRight = false;
+      }
+      this.tabs[1].sigleToRight = false;
+      this.tabs[1].allToLeft = true;
+
+      this.tabs[1].isSelectAllL = false;
+      this.tabs[1].selectCodesL = [];
+    },
+    allToRight: function() {
+      if(!this.tabs[1].allToRight) return;
+
+      for(var i = 0; i < this.tabs[1].codesL.length; i++) {
+        this.tabs[1].codesL[i].isSelected = false;
+      }
+      this.tabs[1].codesR = this.tabs[1].codesR.concat(this.tabs[1].codesL);
+      this.tabs[1].allToLeft = true;
+
+      this.tabs[1].codesL = [];
+      this.tabs[1].selectCodesL = [];
+      this.tabs[1].sigleToRight = false;
+      this.tabs[1].allToRight = false;
+      this.tabs[1].isSelectAllL = false;
+    },
+    toggleSelectedCodeR: function(code) {
+      code.isSelected = !code.isSelected;
+
+      var hasSelected = false;
+      this.tabs[1].selectCodesR = [];
+
+      for(var i = 0; i < this.tabs[1].codesR.length; i++) {
+        if(this.tabs[1].codesR[i].isSelected) {
+          this.tabs[1].selectCodesR.push(this.tabs[1].codesR[i]);
+          hasSelected = true;
+        }
+      }
+
+      if(this.tabs[1].codesR.length == this.tabs[1].selectCodesR.length) {
+        this.tabs[1].isSelectAllR = true;
+      }else {
+        this.tabs[1].isSelectAllR = false;
+      }
+
+      this.tabs[1].sigleToLeft = hasSelected;
+    },
+    toggleSelectedAllR: function() {
+      if(!this.tabs[1].codesR.length) return;
+
+      this.tabs[1].isSelectAllR = !this.tabs[1].isSelectAllR;
+
+      this.tabs[1].selectCodesR = [];
+      for(var i = 0; i < this.tabs[1].codesR.length; i++) {
+        this.tabs[1].codesR[i].isSelected = this.tabs[1].isSelectAllR;
+        if(this.tabs[1].codesR[i].isSelected) {
+          this.tabs[1].selectCodesR.push(this.tabs[1].codesR[i]);
+        }
+      }
+
+      if(this.tabs[1].selectCodesR.length) {
+        this.tabs[1].sigleToLeft = true;
+      }
+    },
+    sigleToLeft: function() {
+      if(!this.tabs[1].sigleToLeft) return;
+
+      for(var i = 0; i < this.tabs[1].selectCodesR.length; i++) {
+        this.tabs[1].codesR.splice(this.tabs[1].codesR.indexOf(this.tabs[1].selectCodesR[i]), 1);
+        this.tabs[1].selectCodesR[i].isSelected = false;
+      }
+      console.log(this.tabs[1].selectCodesR);
+      this.tabs[1].codesL = this.tabs[1].codesL.concat(this.tabs[1].selectCodesR);
+
+      if(!this.tabs[1].codesR.length) {
+        this.tabs[1].allToLeft = false;
+      }
+      this.tabs[1].sigleToLeft = false;
+      this.tabs[1].allToRight = true;
+
+      this.tabs[1].isSelectAllR = false;
+      this.tabs[1].selectCodesR = [];
+    },
+    allToLeft: function() {
+      if(!this.tabs[1].allToLeft) return;
+
+      for(var i = 0; i < this.tabs[1].codesR.length; i++) {
+        this.tabs[1].codesR[i].isSelected = false;
+      }
+      this.tabs[1].codesL = this.tabs[1].codesL.concat(this.tabs[1].codesR);
+      this.tabs[1].allToRight = true;
+
+      this.tabs[1].codesR = [];
+      this.tabs[1].selectCodesR = [];
+      this.tabs[1].sigleToLeft = false;
+      this.tabs[1].allToLeft = false;
+      this.tabs[1].isSelectAllR = false;
     },
     resetFieldsForm: function() {
       this.tabs[0].fields.forEach( function(field, index) {
@@ -349,9 +551,9 @@ export default {
       }
     }
   },
-  props: {
-    baseId: {
-      default: ''
+  watch: {
+    filterText(val) {
+      this.$refs.tree.filter(val);
     }
   },
   created() {
@@ -368,5 +570,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
-
+  .el-tree-node__expand-icon {
+    color: #4ba5ff;
+  }
 </style>
