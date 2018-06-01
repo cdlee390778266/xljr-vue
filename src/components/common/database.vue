@@ -77,9 +77,22 @@
 
 <script>
 export default {
-  name: 'HelloWorld',
+  name: 'database',
+  data() {
+    return {
+      data: []
+    }
+  },
   props: {
-    msg: String
+    baseId: {
+      default: ''
+    }
+  },
+  created() {
+    var _this = this;
+    _this.utils.getJson('/static/data/fileds.json', function(res){
+      _this.data = res.data.ResData;
+    }, function(){}, {baseId: _this.baseId})
   }
 }
 </script>

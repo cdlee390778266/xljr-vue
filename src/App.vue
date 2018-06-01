@@ -1092,7 +1092,6 @@ export default {
                           position: absolute;
                           bottom: -50px;
                           left: 0px;
-                          display: none;
                           width: 80px;
                           line-height: 30px;
                           background: #fff;

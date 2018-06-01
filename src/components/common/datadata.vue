@@ -58,8 +58,8 @@
                           <button class="remove-btn" :class="tabs[1].allToLeft ? 'active': ''" @click="allToLeft"><i class="fa fa-angle-double-left "></i></button>
                           <button class="add-btn" :class="tabs[1].sigleToRight ? 'active': ''" @click="sigleToRight"><i class="fa fa-angle-right"></i></button>
                           <button class="add-btn" :class="tabs[1].allToRight ? 'active': ''" @click="allToRight"><i class="fa fa-angle-double-right"></i></button>
-                          <button class="export">导出</button>
-                          <ul>
+                          <button class="export" @click="toggleExportDialog">导出</button>
+                          <ul v-show="tabs[1].isShowDialog">
                               <li><a href="../../data/data.rar">TXT</a></li>
                               <li><a href="../../data/data.rar">EXCEL</a></li>
                           </ul>
@@ -90,13 +90,14 @@
                       <div class="cdt-box">
                           <div class="cdt-item">
                               <label for="">字段</label>
-                              <select name="" id="screen-fields">
+                              <select v-model="tabs[2].selectField">
                                   <option value=""></option>
+                                  <option :value="field.F001" v-for="field in tabs[2].fields">{{field.F002}}</option>
                               </select>
                           </div>
                           <div class="cdt-item">
                               <label for="">运算符</label>
-                              <select name="" id="screen-opt">
+                              <select name="" v-model="tabs[2].operator">
                                   <option value=""></option>
                                   <option value=">">&gt;</option>
                                   <option value=">=">&gt;=</option>
@@ -110,10 +111,10 @@
                           </div>
                           <div class="cdt-item">
                               <label for="">条件值</label>
-                              <input type="text"  value="" id="screen-input" />
+                              <input type="text" v-model="tabs[2].val" :disabled="!tabs[2].selectField || !tabs[2].operator" />
                           </div>
                           <div class="cdt-item">
-                              <a href="javascript:void(0);" id="screen-add">添加</a>
+                              <a href="javascript:void(0);" @click="addCondition">添加</a>
                           </div>
                       </div>
                       <div class="cdt-list empty">
@@ -130,6 +131,25 @@
                                   </tr>
                               </thead>
                               <tbody>
+                                <template v-if="tabs[2].addList.length">
+                                  <tr v-for="(item, index) in tabs[2].addList">
+                                      <td>{{index}}</td>
+                                      <td>{{item.field}}</td>
+                                      <td>{{item.operator}}</td>
+                                      <td>{{item.val}}</td>
+                                      <td></td>
+                                      <td>
+                                        <template v-if="item.isAnd">
+                                          <i class="fa fa-check-square-o" @click="toggleCheck(item)"></i><span>AND</span>
+                                        </template>
+                                        <template v-else>
+                                          <i class="fa fa-square-o" @click="toggleCheck(item)"></i><span>OR</span>
+                                        </template>
+                                      </td>
+                                      <td><a href="javascript:void(0);" @click="deleteCondition(item)">删除</a></td>
+                                  </tr>
+                                </template>
+                                <template v-else>
                                   <tr>
                                       <td></td>
                                       <td></td>
@@ -166,6 +186,7 @@
                                       <td></td>
                                       <td></td>
                                   </tr>
+                                </template>
                               </tbody>
                           </table>
                       </div>
@@ -297,13 +318,17 @@ export default {
           selectCodesR: [],
           isSelectAllR: false,
           sigleToLeft: false,
-          allToLeft: false
+          allToLeft: false,
+          isShowDialog: false
         },
         {
           type: 'screen', //条件筛选
           isActive: false,
-          trees: [],
-          selectScreen: []
+          fields: [],
+          selectField: '',
+          operator: '',
+          val: '',
+          addList: []
         }
       ]
     }
@@ -499,7 +524,6 @@ export default {
         this.tabs[1].codesR.splice(this.tabs[1].codesR.indexOf(this.tabs[1].selectCodesR[i]), 1);
         this.tabs[1].selectCodesR[i].isSelected = false;
       }
-      console.log(this.tabs[1].selectCodesR);
       this.tabs[1].codesL = this.tabs[1].codesL.concat(this.tabs[1].selectCodesR);
 
       if(!this.tabs[1].codesR.length) {
@@ -526,12 +550,52 @@ export default {
       this.tabs[1].allToLeft = false;
       this.tabs[1].isSelectAllR = false;
     },
+    toggleExportDialog: function() {  //点击导出按钮触发
+      this.tabs[1].isShowDialog = !this.tabs[1].isShowDialog;
+    },
+    addCondition: function() {        //点击添加按钮触发
+      if(!this.tabs[2].selectField) {
+        this.utils.showTip('warning', 'error', '-1020');
+        return;
+      }
+      if(!this.tabs[2].operator) {
+        this.utils.showTip('warning', 'error', '-1021');
+        return;
+      }
+      if(!this.tabs[2].val) {
+        this.utils.showTip('warning', 'error', '-1022');
+        return;
+      }
+      if(isNaN(this.tabs[2].val)){
+        this.utils.showTip('warning', 'error', '-1023');
+        return;
+      }
+      this.tabs[2].addList.push({
+        field: this.tabs[2].selectField,
+        operator: this.tabs[2].operator,
+        val: this.tabs[2].val,
+        isAnd: true
+      })
+
+      this.tabs[2].selectField = '';
+      this.tabs[2].operator = '';
+      this.tabs[2].val = '';
+    },
+    toggleCheck: function(item) {
+      item.isAnd = !item.isAnd;
+    },
+    deleteCondition: function(item) {       //删除条件
+      this.tabs[2].addList.splice(this.tabs[2].addList.indexOf(item), 1);
+    },
     resetFieldsForm: function() {
+
       this.tabs[0].fields.forEach( function(field, index) {
         field.isSelected = false;
       });
       this.tabs[0].isSelectedAll = false;
       this.tabs[0].preview = {}
+
+
     },
     preview: function() {
       var checkedFields = [];
@@ -563,6 +627,7 @@ export default {
         value.isSelected = false;
       })
       _this.tabs[0].fields = res.data.ResData;
+      _this.tabs[2].fields = res.data.ResData;
     }, function(){}, {baseId: _this.baseId})
   }
 }

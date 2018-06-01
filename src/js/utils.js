@@ -69,7 +69,7 @@ Utils.getJson = function(url, success, error, params = {}) {
 		spinner: 'fa fa-refresh fa-spin fa-3x fa-fw ql-loading',
 		customClass: 'loading page-loading'
 	});
-	Utils.$http.get(url, params)
+	Utils.$http.get(url, {params: params})
 		.then(function(res){
 			loadingInstance.close();
             if(typeof success == 'function') success(res)
