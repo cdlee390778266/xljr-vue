@@ -1880,4 +1880,9 @@ export default {
   .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
     opacity: 0;
   }
+  .news-menu {
+    .el-tree-node__content {
+      height: 36px;
+    }
+  }
 </style>

@@ -10,9 +10,9 @@
                     <div id="top-menu" class="top-menu">
                         <router-link to="/home" active-class="active">首页</router-link>
                         <router-link to="/data" active-class="active">数据中心</router-link>
-                        <router-link to="/notices" active-class="active">公告资讯</router-link>
+                        <router-link to="/notice" active-class="active">公告资讯</router-link>
                         <router-link to="/news" active-class="active">新闻中心</router-link>
-                        <router-link to="/export" active-class="active">行情导出</router-link>
+                        <router-link to="/quotation" active-class="active">行情导出</router-link>
                     </div>
                 </div>
                 <div class="header-right-r">
