@@ -18,14 +18,14 @@
                         <input type="hidden" name="F002" id="F002" value="" />
                         <div class="new-form-item">
                             <label for="">证券</label>
-                            <input type="text" placeholder="请输入证券" name="F003" id="F003"/>
-                            <select id="type">
+                            <input type="text" placeholder="请输入证券" v-model="code"/>
+                            <select v-model="searchType">
                                 <option value="0" checked>标题检索</option>
                                 <option value="1">正文检索</option>
                             </select>
-                            <input type="text" placeholder="请输入关键字" name="F004" id="keywords" />
+                            <input type="text" placeholder="请输入关键字" v-model="keyWords"/>
                         </div>
-                        <div class="new-form-item" id="date">
+                        <div class="new-form-item">
                             <label for="">公告日期</label>
                             <el-date-picker
                               v-model="daterRange"
@@ -39,9 +39,9 @@
                             </el-date-picker>
                         </div>
                         <div class="new-form-item">
-                            <input type="submit" value="搜索" class="new-btn search" />
+                            <input type="button" value="搜索" class="new-btn search" @click="search"/>
                             <input type="reset" value="重置" class="new-btn reset" />
-                            <input type="button" value="导出" class="new-btn export"  data-link="../../data/data.rar"/>
+                            <input type="button" value="导出" class="new-btn export" @click="exportContent"/>
                         </div>
                     </form>
                 </div>
@@ -54,22 +54,14 @@
                     </div>
                     <div class="new-page">
                         <div class="page" id="page">
-                          <a class="button_page_disabled first"><span>首页</span></a>
-                          <span>
-                            <a class="button_page_disabled"><span>&lt;</span></a>
-                            <a href="javascript:renderPage(1);" class="button_page_click"><span>1</span></a>
-                            <a href="javascript:renderPage(2);" class="button_page">2</a>
-                            <a href="javascript:renderPage(3);" class="button_page">3</a>
-                            <a href="javascript:renderPage(4);" class="button_page">4</a>
-                            <a href="javascript:renderPage(5);" class="button_page">5</a>
-                            <a href="javascript:renderPage(6);" class="button_page">6</a>
-                            <a href="javascript:renderPage(7);" class="button_page">7</a>
-                            <a href="javascript:renderPage(8);" class="button_page">8</a>
-                            <a href="javascript:renderPage(9);" class="button_page">9</a>
-                            <a href="javascript:renderPage(10);" class="button_page">10</a>
-                            <a href="javascript:renderPage(2);" class="button_page">&gt;</a>
-                          </span>
-                          <a href="javascript:renderPage(13);" class="button_page last">尾页</a>
+                          <el-pagination
+                            background
+                            layout="prev, pager, next"
+                            @current-change="goPage"
+                            :current-page.sync="currentPage"
+                            :page-size="pageSize"
+                            :total="total">
+                          </el-pagination>
                         </div>
                     </div>
                 </div> 
@@ -99,8 +91,12 @@ export default {
         children: 'children',
         label: 'name'
       },
-      noticeList: [],
+      code: '',
+      searchType: '',
+      keyWords: '', 
       daterRange: '',
+      noticeList: [],
+      catId: '',
       pickerOptions: {
         shortcuts: [{
           text: '最近一周',
@@ -127,12 +123,47 @@ export default {
             picker.$emit('pick', [start, end]);
           }
         }]
-      }
+      },
+      currentPage: 1,
+      total: 0,
+      pageSize: 6
     };
   },
   methods: {
     handleNodeClick(data) {
-      console.log(data);
+      var _this = this;
+      _this.catId = data.id;
+      _this.currentPage = 1;
+      _this.utils.getJson('/static/data/noticeslist.json', function(res){
+        _this.noticeList = res.data.ResData.dataList;
+        _this.total = res.data.ResData.total
+      }, function(){}, {catId: _this.catId, currentPage: _this.currentPage, pageSize: _this.pageSize})
+    },
+    goPage(val) {
+      var _this = this;
+      _this.utils.getJson('/static/data/noticeslist.json', function(res){
+        _this.noticeList = res.data.ResData.dataList;
+        _this.total = res.data.ResData.total
+      }, function(){}, {catId: _this.catId, currentPage: _this.currentPage, pageSize: _this.pageSize})
+    },
+    search() {
+      if(!this.code) {
+        this.utils.showTip('warning', 'error', '-1030');
+        return;
+      }
+      if(!this.keyWords) {
+        this.utils.showTip('warning', 'error', '-1031');
+        return;
+      }
+      var _this = this;
+      _this.currentPage = 1;
+      _this.utils.getJson('/static/data/noticeslist.json', function(res){
+        _this.noticeList = res.data.ResData.dataList;
+        _this.total = res.data.ResData.total
+      }, function(){}, {catId: _this.catId, currentPage: _this.currentPage, pageSize: _this.pageSize, code: _this.code, searchType: _this.searchType, keyWords: _this.keyWords, daterRange: _this.daterRange})
+    },
+    exportContent() {
+      
     }
   },
   created() {
@@ -141,8 +172,9 @@ export default {
       _this.leftMenu = res.data.ResData;
     }, function(){})
     _this.utils.getJson('/static/data/noticeslist.json', function(res){
-      _this.noticeList = res.data.ResData;
-    }, function(){})
+      _this.noticeList = res.data.ResData.dataList;
+      _this.total = res.data.ResData.total
+    }, function(){}, {catId: _this.catId, currentPage: _this.currentPage, pageSize: _this.pageSize})
   }
 }
 </script>
@@ -151,5 +183,34 @@ export default {
 <style>
   .el-date-editor--daterange.el-input, .el-date-editor--daterange.el-input__inner, .el-date-editor--timerange.el-input, .el-date-editor--timerange.el-input__inner {
     width: 216px;
+    height: 34px;
+    line-height: 34px;
+    border-radius: 0;
+  }
+  .el-date-editor .el-range-separator {
+    line-height: 26px;
+  }
+  .el-date-editor .el-range__icon {
+    display: none;
+  }
+  .el-pagination.is-background .btn-next, .el-pagination.is-background .btn-prev, .el-pagination.is-background .el-pager li {
+    margin: 0;
+    border: 1px solid #dcdcdc;
+    border-right: none;
+    border-radius: 0;
+    background: #fff;
+    font-weight: normal;
+    color: #999;
+  }
+  .el-pagination .btn-next {
+    border-right: 1px solid #dcdcdc !important;
+  }
+  .el-pagination.is-background .el-pager li:not(.disabled).active {
+    background: #45d48f !important;
+    color: #fff !important;
+  }
+  .el-pagination.is-background .el-pager li:not(.disabled):hover {
+    background: #eee;
+    color: #999;
   }
 </style>
