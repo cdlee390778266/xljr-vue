@@ -16,18 +16,18 @@
                       <input type="hidden" name="F001" id="F001" value="wq123" />
                       <input type="hidden" name="F002" id="F002" value="" />
                       <div class="new-form-item">
-                          <select>
+                          <select v-model="F001">
                               <option value="0" checked>前复权</option>
-                              <option value="1">前复权</option>
+                              <option value="1">权</option>
                           </select>
                       </div>
                       <div class="new-form-item">
-                          <select>
+                          <select v-model="F002">
                               <option value="0" checked>日线</option>
-                              <option value="1">日线</option>
+                              <option value="1">K线</option>
                           </select>
                       </div>
-                      <div class="new-form-item" id="date">
+                      <div class="new-form-item">
                           <label for="">日期</label>
                           <el-date-picker
                             v-model="daterRange"
@@ -41,7 +41,7 @@
                           </el-date-picker>
                       </div>
                       <div class="new-form-item">
-                          <input type="button" value="预览" class="new-btn search"  id="preview" />
+                          <input type="button" value="预览" class="new-btn search"   @click="preview"/>
                           <input type="button" value="导出" class="new-btn export"  id="download" />
                       </div>
                   </form>
@@ -112,10 +112,10 @@
                           <table id="table">
                             <thead>
                               <tr>
-                                <template >
-                                  <th ></th>
+                                <template v-if="previewData.ColNames">
+                                  <th v-for="th in previewData.ColNames">{{th}}</th>
                                 </template>
-                                <template >
+                                <template v-else>
                                   <th></th>
                                   <th></th>
                                   <th></th>
@@ -132,14 +132,14 @@
                               </tr>
                             </thead>
                             <tbody>
-                              <template >
-                                <tr>
-                                  <td></td>
-                                  <td></td>
-                                  <td></td>
+                              <template v-if="previewData.Data">
+                                <tr v-for="td in previewData.Data">
+                                  <td>{{td.Stkcd}}</td>
+                                  <td>{{td.Trddt}}</td>
+                                  <td>{{td.Clsprc}}</td>
                                 </tr>
                               </template>
-                              <template >
+                              <template v-else>
                                 <tr >
                                   <td colspan="12" class="empty">
                                     <img src="static/images/empty.png" alt=""> <br> 没有相应数据！
@@ -177,12 +177,10 @@ export default {
         children: 'children',
         label: 'name'
       },
-      code: '',
-      searchType: '',
-      keyWords: '', 
-      daterRange: '',
-      noticeList: [],
       catId: '',
+      F001: '',
+      F002: '', 
+      daterRange: '',
       pickerOptions: {
         shortcuts: [{
           text: '最近一周',
@@ -211,6 +209,7 @@ export default {
         }]
       },
       filterText: '',
+      previewData: [],
       codeData: {
         type: 'code',   //代码选择
         isActive: false,
@@ -237,11 +236,14 @@ export default {
     handleNodeClick(data) {
       var _this = this;
       _this.catId = data.id;
-      _this.currentPage = 1;
-      _this.utils.getJson('/static/data/newslist.json', function(res){
-        _this.noticeList = res.data.ResData.dataList;
-        _this.total = res.data.ResData.total
-      }, function(){}, {catId: _this.catId, currentPage: _this.currentPage, pageSize: _this.pageSize})
+      _this.F001 = '';
+      _this.F002 = '';
+      _this.daterRange = '';
+      _this.filterText = '';
+      _this.previewData = [];
+      _this.utils.getJson('/static/data/codeTree.json', function(res){
+        _this.codeData.trees = res.data.ResData;
+      }, function(){}, {catId: _this.catId})
     },
     search() {
       if(!this.code) {
@@ -437,6 +439,26 @@ export default {
     },
     toggleExportDialog: function() {  //点击导出按钮触发
       this.codeData.isShowDialog = !this.codeData.isShowDialog;
+    },
+    preview: function() {
+      if(!this.F001) {
+        this.utils.showTip('warning', 'error', '-1040')
+        return
+      }
+      if(!this.F002) {
+        this.utils.showTip('warning', 'error', '-1041')
+        return
+      }
+      
+      var _this = this;
+      _this.utils.getJson('/static/data/preview.json', function(res){
+        _this.previewData = res.data.ResData[0];
+      }, function(){}, {catId: _this.catId,F001: _this.F001, F002: _this.F002, daterRange: _this.daterRange})
+    }
+  },
+  watch: {
+    filterText(val) {
+      this.$refs.tree.filter(val);
     }
   },
   created() {
@@ -446,13 +468,13 @@ export default {
     }, function(){})
     _this.utils.getJson('/static/data/codeTree.json', function(res){
       _this.codeData.trees = res.data.ResData;
-    }, function(){}, {baseId: _this.baseId})
+    }, function(){}, {catId: _this.catId})
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style>
+<style scoped>
   .el-date-editor--daterange.el-input, .el-date-editor--daterange.el-input__inner, .el-date-editor--timerange.el-input, .el-date-editor--timerange.el-input__inner {
     width: 330px;
     height: 34px;
@@ -461,8 +483,5 @@ export default {
   }
   .el-date-editor .el-range-separator {
     line-height: 26px;
-  }
-  .el-date-editor .el-range__icon {
-    display: none;
   }
 </style>

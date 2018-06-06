@@ -10,19 +10,19 @@
                     <div id="top-menu" class="top-menu">
                         <router-link to="/home" active-class="active">首页</router-link>
                         <router-link to="/data" active-class="active">数据中心</router-link>
-                        <router-link to="/notice" active-class="active">公告资讯</router-link>
+                        <router-link to="/notice" active-class="active" :class="!user.name ? 'disabled' : ''">公告资讯</router-link>
                         <router-link to="/news" active-class="active">新闻中心</router-link>
                         <router-link to="/quotation" active-class="active">行情导出</router-link>
                     </div>
                 </div>
                 <div class="header-right-r">
-                    <span>欢迎你！ 游客</span>
+                    <span>欢迎你！ <template v-if="!user.name">游客</template><template v-else>{{user.name}}</template></span>
                     <i class="fa fa-angle-down"></i>
                     <ul>
-                        <li class="line"><router-link to="/loginOut">退出</router-link>
+                        <li class="line" v-if="user.name"><a href="javascript: void(0);" @click="loginOut">退出</a>
                         </li>
-                        <li><a href="javascript:void(0);" class="blueBg" id="login" @click="showLoginDialog">登录</a></li>
-                        <li><router-link to="/register" class="warningBg">注册</router-link></li>
+                        <li v-if="!user.name"><a href="javascript:void(0);" class="blueBg" id="login" @click="showLoginDialog">登录</a></li>
+                        <li v-if="!user.name"><router-link to="/register" class="warningBg">注册</router-link></li>
                     </ul>
                 </div>
             </div>
@@ -31,7 +31,7 @@
     <div class="login-dialog" v-show="isShowLogin">
        <div class="login-dialog-mask" @click="hideLoginDialog"></div>
        <form class="login-dialog-box">
-           <h1><img src="static/assets/images/login_title.png"></h1>
+           <h1><img src="static/images/login_title.png"></h1>
            <div class="login-main">
                <div class="login-row">
                    <label for="">用户名</label>
@@ -69,7 +69,9 @@ export default {
   name: 'ql-head',
   data() {
     return {
-      isShowLogin: false
+      isShowLogin: false,
+      isLogin: false,
+      user: {}
     }
   },
   methods: {
@@ -78,7 +80,14 @@ export default {
     },
     hideLoginDialog: function() {
       this.isShowLogin = false;
+    },
+    loginOut() {
+      this.utils.setUser({});
+      this.$router.push('/login');
     }
+  },
+  created() {
+    this.user = this.utils.getUser();
   }
 }
 </script>

@@ -323,7 +323,7 @@ export default {
       left: 50%;
       width: 530px;
       height: 430px;
-      margin-top: -215px;
+      margin-top: -260px;
       margin-left: -265px;
       background: #fff;
       box-shadow: 0 0 15px 0 #444;
@@ -422,7 +422,6 @@ export default {
           bottom: 0;
           left: 0;
           right: 0;
-          display: none;
           height: 46px;
           line-height: 46px;
           text-align: center;
@@ -481,13 +480,14 @@ export default {
 
   /*********** 注册 ***********/
   .reg {
-      position: absolute;
-      top: 50% !important;
-      left: 50%;
-      width: 670px !important;
-      height: 745px !important;
-      margin-top: -372px !important;
-      margin-left: -335px !important;
+      position: relative !important;
+      top: 100px !important;
+      left: 0% !important;
+      width: 600px !important;
+      height: 780px !important;
+      margin-top: 0px !important;
+      margin-left: auto !important;
+      margin-right: auto !important;
       background: #fff !important;
       box-shadow: 0 0 15px 0 #444 !important;
       border-radius: 4px !important;
@@ -528,7 +528,7 @@ export default {
   .reg-main {
       padding: 0 10px;
       margin-top: 10px;
-      height: 660px;
+      height: 720px;
       overflow-y: auto;
       .reg-row {
           margin: 10px auto;
@@ -700,9 +700,6 @@ export default {
               background: #1481b3;
           }
       }
-  }
-  .reg-success {
-      display: none;
   }
   .reg-success-body {
       width: 260px;
@@ -1884,5 +1881,8 @@ export default {
     .el-tree-node__content {
       height: 36px;
     }
+  }
+  .el-date-editor .el-range__icon {
+    display: none;
   }
 </style>

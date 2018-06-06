@@ -49,7 +49,7 @@
                     <div class="new-body">
                       <div class="new-item" v-for="notice in noticeList">
                         <h3 class="active">{{notice.F002}}</h3>
-                        <router-link :to="'/notice/detail/'+notice.F001">{{notice.F004}}...</router-link>
+                        <router-link :to="'/news/detail/'+notice.F001">{{notice.F004}}...</router-link>
                       </div>
                     </div>
                     <div class="new-page">

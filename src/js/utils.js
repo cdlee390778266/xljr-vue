@@ -1,10 +1,13 @@
 import axios from 'axios'
 import CONFIG from './config'
 import { Loading, Message, MessageBox } from 'element-ui';
+import store from '../store/vuex'
 
 var Utils = {}
 
 Utils.$http = axios;
+
+Utils.$store = store;
 
 /**
  * Gets the tip text 获取提示文字
@@ -79,6 +82,42 @@ Utils.getJson = function(url, success, error, params = {}) {
         	Utils.showTip('error', 'error', '-1');
             if(typeof error == 'function') error(err)
         })
+}
+
+/**
+ * Sets the user.设置登录用户
+ *
+ * @param      {<type>}  user    The user
+ */
+Utils.setUser = function(user) {
+	store.dispatch('setUser', Object.assign({}, user))
+}
+
+/**
+ * Gets the user.获取登录用户信息
+ *
+ * @return     {<type>}  The user.
+ */
+Utils.getUser = function() {
+	return store.getters.getUser;
+}
+
+/**
+ * Sets the login.设置是否登录
+ *
+ * @param      {boolean}  isLogin  Indicates if login
+ */
+Utils.setLogin = function(isLogin) {
+	store.dispatch('setLogin', isLogin)
+}
+
+/**
+ * Gets the login.获取是否登录
+ *
+ * @return     {<type>}  The login.
+ */
+Utils.getLogin = function() {
+	return store.getters.getLogin;
 }
 
 export default Utils

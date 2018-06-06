@@ -1,125 +1,175 @@
 <template>
   <div class="login">
-    <form action="" class="reg" id="reg">
+    <el-form :model="registerForm" :rules="rules"  label-width="100px" class="reg" v-show="!isShowTip" ref="registerForm">
         <div class="reg-title">
-            <div class="reg-title-left">
-                注册
-            </div>
+            <div class="reg-title-left">注册</div>
             <div class="reg-title-right">
                 <span>已有账号？</span>
                 <router-link to="/login">返回登录</router-link>
             </div>
         </div>
         <div class="reg-main reg-form">
-            <div class="reg-row">
-                <span class="reg-text">姓名</span>
-                <input type="text" class="login-text" name="F001" id="name"/>
+            <el-form-item label="用户名" prop="name">
+                <el-input v-model="registerForm.name"></el-input>
+            </el-form-item>
+            <el-form-item label="性别" prop="sex">
+                <el-radio-group v-model="registerForm.sex">
+                    <el-radio label="0">男</el-radio>
+                    <el-radio label="1">女</el-radio>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item label="密码" prop="pwd">
+                <el-input v-model="registerForm.pwd" type="password"></el-input>
+            </el-form-item>
+            <el-form-item label="确认密码" prop="cpwd">
+                <el-input v-model="registerForm.cpwd" type="password"></el-input>
+            </el-form-item>
+            <el-form-item label="固定电话" prop="tel">
+                <el-input v-model="registerForm.tel"></el-input>
+            </el-form-item>
+            <el-form-item label="手机" prop="phone">
+                <el-input v-model="registerForm.phone"></el-input>
+            </el-form-item>
+            <el-form-item label="电子邮箱" prop="email">
+                <el-input v-model="registerForm.email"></el-input>
+            </el-form-item>
+            <el-form-item label="真实姓名" prop="relName">
+                <el-input v-model="registerForm.relName"></el-input>
+            </el-form-item>
+            <el-form-item label="身份证" prop="ID">
+                <el-input v-model="registerForm.ID"></el-input>
+            </el-form-item>
+            <el-form-item label="开户营业部" prop="kh">
+                <el-input v-model="registerForm.kh"></el-input>
+            </el-form-item>
+            <el-form-item>
+            <el-button type="primary" @click="submitForm('registerForm')">注册</el-button>
+            <el-button @click="resetForm('registerForm')">重置</el-button>
+            </el-form-item>
+        </div>
+    </el-form>
+    <div class="reg-success reg-main reg" v-show="isShowTip"> 
+        <div class="reg-success-body" :class="isRegSuccess ? '' : 'reg-error'">
+            <div class="reg-success-img">
+                <i></i>
+                <span id="res-text">
+                    <template v-if="isRegSuccess">恭喜您，注册成功</template>
+                    <template v-else>对不起，注册失败！</template>
+                </span>
+                <span class="reg-line"></span>
             </div>
-            <div class="reg-row">
-                <span class="reg-text">性别</span>
-                <label>
-                    <input type="radio" name="F002" value="0" checked="" />
-                    <i></i>
-                    <span>男</span>
-                </label>
-                <label>
-                    <input type="radio" name="F002" value="1" />
-                    <i></i>
-                    <span>女</span>
-                </label>
+            <div class="reg-success-mes">
+                <template v-if="isRegSuccess">
+                    您的用户名：{{registerForm.name}}<br>
+                    密码：{{registerForm.pwd}}
+                </template>
             </div>
-            <div class="reg-row">
-                <span class="reg-text">身份证</span>
-                <input type="text" class="login-text" name="F003" id="ID"/>
+            <div class="reg-success-btns" v-if="isRegSuccess">
+                <router-link to="/login">直接登录</router-link>
             </div>
-            <div class="reg-row">
-                <span class="reg-text">开户营业部</span>
-                <input type="text" class="login-text" name="F004" />
-            </div>
-            <div class="reg-row">
-                <span class="reg-text">固定电话</span>
-                <input type="text" class="login-text" name="F005" id="phone"/>
-            </div>
-            <div class="reg-row">
-                <span class="reg-text"><i>*</i>手机</span>
-                <input type="text" class="login-text" name="F006" id="mobile"/>
-            </div>
-            <div class="reg-row">
-                <span class="reg-text"><i>*</i>用户名</span>
-                <input type="text" class="login-text" name="F007" />
-            </div>
-            <div class="reg-row">
-                <span class="reg-text"><i>*</i>密码</span>
-                <input type="password" class="login-text" name="F008"  id="pwd" />
-            </div>
-            <div class="reg-row">
-                <span class="reg-text"><i>*</i>确认密码</span>
-                <input type="password" class="login-text" name="F009" id="cPwd" />
-            </div>
-            <div class="reg-row">
-                <span class="reg-text"><i>*</i>电子邮箱</span>
-                <input type="text" class="login-text" name="F010" />
-            </div>
-            <div class="reg-row reg-code">
-                <span class="reg-text"><i>*</i>验证码</span>
-                <input type="text" class="login-text" name="F011" />
-                <img src="static/assets/images/login_bg.png" height="1467" width="2495" alt="" />
-            </div>
-            <!-- <div class="reg-row">
-                <span class="reg-text"></span>
-                <div class="reg-checkbox">
-                    <input type="checkbox" />
-                    <i></i>
-                    <span>我已阅读并同意<a href="">《许可协议》</a></span>
-                </div>
-            </div> -->
-            <div class="reg-row">
-                <span class="reg-text"></span>
-                <input type="submit" value="注册"  id="reg-submit" />
+            <div class="reg-success-btns" v-else>
+                <a href="javascript: void(0);" @click="hideTip">重新注册</a>
             </div>
         </div>
-        <div class="reg-success reg-main"> 
-            <div class="reg-success-body reg-error">
-                <div class="reg-success-img">
-                    <i></i>
-                    <span id="res-text">对不起，注册失败！</span>
-                    <span class="reg-line"></span>
-                </div>
-                <div class="reg-success-mes">
-                    
-                </div>
-                <div class="reg-success-btns">
-                    <a href="javascript: void(0);">直接登录</a>
-                </div>
-            </div>
-        </div>
-    </form>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'HelloWorld',
-  props: {
-    msg: String
-  }
+    name: 'register',
+    data() {
+        var validatePass = (rule, value, callback) => {
+            if (value === '') {
+                callback(new Error('请输入密码'));
+            } else {
+                if (this.registerForm.cpwd !== '') {
+                    this.$refs.registerForm.validateField('cpwd');
+                }
+                callback();
+            }
+        };
+        var validatePass2 = (rule, value, callback) => {
+            if (value === '') {
+                callback(new Error('请再次输入密码'));
+            } else if (value !== this.registerForm.pwd) {
+                callback(new Error('两次输入密码不一致!'));
+            } else {
+                callback();
+            }
+        };
+        return {    
+            isShowTip: false,
+            isRegSuccess: false,
+            registerForm: {
+              relName: '',
+              sex: '0',
+              ID: '',
+              kh: '',
+              tel: '',
+              phone: '',
+              name: '',
+              pwd: '',
+              cpwd: '',
+              email: '',
+              region: ''
+            },
+            rules: {
+              relName: [
+                { min: 2, max: 6, message: '长度在 2 到 6 个字符', trigger: 'blur' }
+              ],
+              sex: [
+                { required: true,  trigger: 'blur' }
+              ],
+              ID: [
+                { min: 15, max: 18, message: '长度在15 到 18 个字符', trigger: 'blur' }
+              ],
+              name: [
+                { required: true, message: '请输入用户名', trigger: 'blur' },
+                { min: 2, max: 6, message: '长度在 2 到 6 个字符', trigger: 'blur' }
+              ],
+              pwd: [
+                { required: true, message: '请输入密码', trigger: 'blur' },
+                { min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur' },
+                { validator: validatePass, trigger: 'blur' }
+              ],
+              cpwd: [
+                { required: true, message: '请输入确认密码', trigger: 'blur' },
+                { validator: validatePass2, trigger: 'blur' }
+              ],
+            }
+        }
+    },
+    methods: {
+      submitForm(formName) {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            var _this = this;
+            _this.utils.getJson('/static/data/reg.json', function(res){
+              _this.isRegSuccess = true;
+              _this.isShowTip = true;
+            }, function(){
+                _this.isRegSuccess = false;
+                _this.isShowTip = true;
+            })
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
+      },
+      resetForm(formName) {
+        this.$refs[formName].resetFields();
+      },
+      hideTip() {
+        this.isShowTip = false;
+        this.isRegSuccess = false;
+      }
+    }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
+
 </style>
