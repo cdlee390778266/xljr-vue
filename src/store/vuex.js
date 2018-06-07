@@ -16,12 +16,17 @@ var cookie = JSON.parse(VueCookies.get(CONFIG.cookieKey));
 
 export default new Vuex.Store({
 	state: {
-		isLogin: cookie ? cookie.isLogin : false ,
-		user: {}
+		isLogin: cookie ? true : false ,
+		user: cookie ? cookie : {name: '', password: '', isRemember: false}
 	},
 	mutations: {
 		setUser: function(state, payload) {
 			state.user = payload;
+			if(payload.name) {
+				VueCookies.set(CONFIG.cookieKey, JSON.stringify(payload), '2d');
+			}else {
+				$cookies.remove(CONFIG.cookieKey);
+			}
 		},
 		setLogin: function(state, payload) {
 			state.isLogin = payload;

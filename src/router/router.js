@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import Utils from '../js/utils'
 
+import LoginReg from '../components/login/loginreg'
 import Login from '../components/login/login'
 import Register from '../components/login/register'
 import Home from '../components/pages/home'
@@ -22,16 +24,25 @@ const router = new Router({
       meta: { title: '登录'}
     },
     {
-      path: '/login',
-      name: 'login',
-      component: Login,
-      meta: { title: '登录'}
-    },
-    {
-      path: '/register',
-      name: 'register',
-      component: Register,
-      meta: { title: '注册'}
+      path: '/loginreg',
+      component: LoginReg,
+      beforeEnter: (to, from, next) => {
+        if(!Utils.getUser().name) next()
+      },
+      children: [
+        {
+          path: '/login',
+          name: 'login',
+          component: Login,
+          meta: { title: '登录'}
+        },
+        {
+          path: '/register',
+          name: 'register',
+          component: Register,
+          meta: { title: '注册'}
+        }
+      ]
     },
     {
       path: '/home',
@@ -73,9 +84,15 @@ const router = new Router({
       path: '/quotation',
       name: 'quotation',
       component: Quotation,
-      meta: { title: '行情导出'}
+      meta: { title: '行情导出'},
+      beforeEnter: (to, from, next) => {
+        if(Utils.getUser().name) next()
+      }
     },
-  ]
+  ],
+  scrollBehavior (to, from, savedPosition) {
+    return { x: 0, y: 0 }
+  }
 });
 
 router.beforeEach((to, from, next) => {

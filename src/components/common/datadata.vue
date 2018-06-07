@@ -389,24 +389,39 @@ export default {
       }
       
       var _this = this;
-      _this.utils.getJson('/static/data/code.json', function(res){
-        res.data.ResData.forEach(function(value,i){
-          value.isSelected = false;
-        })
+      if(checkedCodeArr.length) {
+        _this.utils.getJson('/static/data/code.json', function(res){
+          res.data.ResData.forEach(function(value,i){
+            value.isSelected = false;
+          })
 
-        _this.tabs[1].codesL = res.data.ResData;
+          _this.tabs[1].codesL = res.data.ResData;
+          _this.tabs[1].selectCodesL = [];
+          _this.tabs[1].isSelectAllL = false;
+          _this.tabs[1].sigleToRight = false;
+          _this.tabs[1].allToRight = true;
+
+          _this.tabs[1].codesR = [];
+          _this.tabs[1].selectCodesR = [];
+          _this.tabs[1].isSelectAllR = false;
+          _this.tabs[1].sigleToLeft = false;
+          _this.tabs[1].allToLeft = false;
+
+        }, function(){}, {baseId: _this.baseId, checkedCodeArr: checkedCodeArr})
+      }else {
+        
+        _this.tabs[1].codesL = [];
         _this.tabs[1].selectCodesL = [];
         _this.tabs[1].isSelectAllL = false;
         _this.tabs[1].sigleToRight = false;
-        _this.tabs[1].allToRight = true;
+        _this.tabs[1].allToRight = false;
 
         _this.tabs[1].codesR = [];
         _this.tabs[1].selectCodesR = [];
         _this.tabs[1].isSelectAllR = false;
         _this.tabs[1].sigleToLeft = false;
         _this.tabs[1].allToLeft = false;
-
-      }, function(){}, {baseId: _this.baseId, checkedCodeArr: checkedCodeArr})
+      }
     },
     toggleSelectedCodeL: function(code) {
       code.isSelected = !code.isSelected;

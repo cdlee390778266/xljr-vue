@@ -107,12 +107,13 @@ export default {
       .header-right {
           font-size: 14px;
           float: right;
+          width: 640px;
           .header-right-l {
               float: left;
               .top-menu {
                   & > a {
                       display: inline-block;
-                      width: 100px;
+                      width: 90px;
                       color: #fff;
                       line-height: 70px;
                       text-align: center;
@@ -135,7 +136,9 @@ export default {
               float: right;
               color: #fff;
               line-height: 70px;
-              margin-left: 40px;
+              margin-left: 10px;
+              width: 160px;
+              text-align: right;
               i {
                   color: #999;
                   transition: all .4s;
